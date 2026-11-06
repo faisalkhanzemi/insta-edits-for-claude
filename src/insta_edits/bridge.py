@@ -9,6 +9,7 @@ bridge re-reads the list itself and sends `notifications/tools/list_changed` whe
 from __future__ import annotations
 
 import json
+import os
 import sys
 import threading
 from typing import Any, Callable, Optional, TextIO
@@ -88,6 +89,83 @@ class ToolSync:
         return before is not None and names != before
 
 
+OFFLINE_INSTRUCTIONS = (
+    "Instagram Edits for Mac isn't reachable yet, so no Edits tools are available. "
+    + HINT_UNREACHABLE
+    + " The tools appear on their own once Edits answers."
+)
+
+
+class Offline:
+    """Lets the client connect before Edits is running.
+
+    If Edits can't be reached when the client initializes, the bridge answers `initialize` itself,
+    reports no tools, and keeps trying Edits in the background. When Edits answers, the bridge
+    opens the real session and sends `notifications/tools/list_changed`, so the editor's tools
+    appear without restarting the client.
+    """
+
+    def __init__(self, client: EditsClient, writer: Writer, stop: threading.Event, log: Callable[[str], None]):
+        self._client = client
+        self._writer = writer
+        self._stop = stop
+        self._log = log
+        self._lock = threading.Lock()
+        self._init: Optional[dict] = None
+        self.active = False
+        try:
+            self._interval = float(os.environ.get("INSTA_EDITS_OFFLINE_POLL", "5"))
+        except ValueError:
+            self._interval = 5.0
+
+    def answer_initialize(self, message: dict) -> dict:
+        from . import __version__
+
+        params = message.get("params") if isinstance(message.get("params"), dict) else {}
+        with self._lock:
+            self._init = message
+            if not self.active:
+                self.active = True
+                threading.Thread(target=self._reconnect, name="edits-reconnect", daemon=True).start()
+        return {
+            "jsonrpc": "2.0",
+            "id": message.get("id"),
+            "result": {
+                "protocolVersion": params.get("protocolVersion") or "2025-06-18",
+                "capabilities": {"tools": {"listChanged": True}},
+                "serverInfo": {"name": "insta-edits", "version": __version__},
+                "instructions": OFFLINE_INSTRUCTIONS,
+            },
+        }
+
+    def answer_locally(self, message: Any) -> Optional[dict]:
+        """While offline, reply to the few requests that don't need Edits. None means forward it."""
+        if not self.active or not isinstance(message, dict):
+            return None
+        method = message.get("method")
+        if method == "tools/list":
+            return {"jsonrpc": "2.0", "id": message.get("id"), "result": {"tools": []}}
+        if method == "ping":
+            return {"jsonrpc": "2.0", "id": message.get("id"), "result": {}}
+        return None
+
+    def _reconnect(self) -> None:
+        while not self._stop.wait(self._interval):
+            with self._lock:
+                init = dict(self._init or {})
+            init["id"] = "insta-edits:reconnect"
+            try:
+                self._client.post(init)
+                self._client.post({"jsonrpc": "2.0", "method": "notifications/initialized"})
+            except (EditsUnreachable, EditsHTTPError):
+                continue
+            with self._lock:
+                self.active = False
+            self._log("Edits is reachable now; notifying the client")
+            self._writer.write(LIST_CHANGED)
+            return
+
+
 def serve(
     client: EditsClient,
     stdin: TextIO = sys.stdin,
@@ -100,6 +178,7 @@ def serve(
     stop = threading.Event()
     listener: Optional[threading.Thread] = None
     sync = ToolSync(client, log) if sync_tools else None
+    offline = Offline(client, writer, stop, log)
 
     for raw in stdin:
         raw = raw.strip()
@@ -112,10 +191,20 @@ def serve(
             continue
         messages = incoming if isinstance(incoming, list) else [incoming]
         for message in messages:
+            local = offline.answer_locally(message)
+            if local is not None:
+                writer.write(local)
+                continue
+            if offline.active and isinstance(message, dict) and message.get("method") == "notifications/initialized":
+                continue
             try:
                 replies = client.post(message)
             except EditsUnreachable as err:
                 log(f"cannot reach Edits at {client.url}: {err}")
+                if isinstance(message, dict) and message.get("method") == "initialize" and "id" in message:
+                    log("starting without Edits; its tools will appear once it answers")
+                    writer.write(offline.answer_initialize(message))
+                    continue
                 reply = _error_for(message, -32001, f"Cannot reach Edits at {client.url}. {HINT_UNREACHABLE}")
                 if reply:
                     writer.write(reply)

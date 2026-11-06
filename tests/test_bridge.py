@@ -175,15 +175,6 @@ def test_bad_token_becomes_a_clear_jsonrpc_error():
         assert "wrong" not in b.close(), "the token must never be logged"
 
 
-def test_edits_closed_becomes_a_clear_jsonrpc_error():
-    b = BridgeProcess("http://127.0.0.1:9/mcp")
-    b.send(INIT)
-    err = b.wait_for(lambda m: m.get("id") == 1)
-    assert err["error"]["code"] == -32001
-    assert "Enable Automation Server" in err["error"]["message"]
-    b.close()
-
-
 def test_batch_requests_are_split():
     with FakeEdits() as edits:
         b = BridgeProcess(edits.url)
@@ -191,3 +182,47 @@ def test_batch_requests_are_split():
         b.wait_for(lambda m: m.get("id") == 1)
         assert "cacheScope" not in b.wait_for(lambda m: m.get("id") == 2)["result"]
         b.close()
+
+
+def _free_port():
+    import socket
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+def test_starts_without_edits_and_picks_it_up_when_it_appears(monkeypatch):
+    port = _free_port()
+    monkeypatch.setenv("INSTA_EDITS_OFFLINE_POLL", "0.2")
+    b = BridgeProcess(f"http://127.0.0.1:{port}/mcp")
+    b.send(INIT)
+    init = b.wait_for(lambda m: m.get("id") == 1)
+    assert init["result"]["serverInfo"]["name"] == "insta-edits"
+    assert init["result"]["capabilities"]["tools"]["listChanged"] is True
+    assert "isn't reachable" in init["result"]["instructions"]
+    b.send(INITIALIZED)
+    b.send({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
+    assert b.wait_for(lambda m: m.get("id") == 2)["result"] == {"tools": []}
+    b.send({"jsonrpc": "2.0", "id": 3, "method": "ping"})
+    assert b.wait_for(lambda m: m.get("id") == 3)["result"] == {}
+
+    with FakeEdits(port=port) as edits:
+        b.wait_for(lambda m: m.get("method") == "notifications/tools/list_changed", timeout=10)
+        b.send({"jsonrpc": "2.0", "id": 4, "method": "tools/list"})
+        tools = b.wait_for(lambda m: m.get("id") == 4)["result"]["tools"]
+        assert {t["name"] for t in tools} >= {"appState", "openProject"}
+        assert any(r["msg"].get("method") == "initialize" for r in edits.received)
+        b.close()
+
+
+def test_calls_still_explain_what_to_do_while_edits_is_closed():
+    port = _free_port()
+    b = BridgeProcess(f"http://127.0.0.1:{port}/mcp")
+    b.send(INIT)
+    b.wait_for(lambda m: m.get("id") == 1)
+    b.send({"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {"name": "appState", "arguments": {}}})
+    err = b.wait_for(lambda m: m.get("id") == 5)["error"]
+    assert err["code"] == -32001
+    assert "Enable Automation Server" in err["message"]
+    b.close()

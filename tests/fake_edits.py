@@ -26,7 +26,9 @@ EDITOR_TOOLS = HOME_TOOLS + [{"name": "addText", "inputSchema": {"type": "object
 
 
 class FakeEdits:
-    def __init__(self, sse_replies: bool = False, stream: bool = False, cache_scope: Optional[str] = None):
+    def __init__(
+        self, sse_replies: bool = False, stream: bool = False, cache_scope: Optional[str] = None, port: int = 0
+    ):
         self.sse_replies = sse_replies
         self.stream = stream
         self.cache_scope = cache_scope
@@ -99,7 +101,7 @@ class FakeEdits:
                 self.end_headers()
                 self.wfile.write(body)
 
-        self.httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self.httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
         self.url = f"http://127.0.0.1:{self.httpd.server_address[1]}/mcp"
         self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
 

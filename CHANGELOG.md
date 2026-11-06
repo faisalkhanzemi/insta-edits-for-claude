@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-11-07
+
+### Added
+- Start in any order: if Edits isn't reachable when the client initializes, the bridge answers `initialize` itself, reports no tools, retries Edits in the background (every 5 s, `INSTA_EDITS_OFFLINE_POLL`) and sends `notifications/tools/list_changed` once Edits answers. Directories that start the server to list its tools, such as Glama, now work without Edits.
+
+### Changed
+- `doctor` says when a project is open instead of promising more tools.
+
 ## [0.1.0] - 2026-11-07
 
 ### Added
@@ -14,4 +22,5 @@ All notable changes to this project are documented here. The format follows [Kee
 - `doctor` command (with `--json` for bug reports) and `set-token` (hidden prompt, file saved with 0600 permissions).
 - Claude Code plugin with a keychain-stored token prompt, a marketplace manifest, and an `edits` skill with notes measured against Edits 454: sandboxed import folders, absolute paths, HDR projects, beat detection fallback, keyframe and export formats, and library music in automation exports.
 
+[0.1.1]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.1
 [0.1.0]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.0
