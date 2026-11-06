@@ -22,6 +22,8 @@ Claude Code ──stdio──▶ insta-edits ──HTTP──▶ Edits for Mac (
              ◀── tools/list_changed ──┘  checks the tool set after each call
 ```
 
+**Works with** Claude Code in the terminal and in the Code tab of the Claude desktop app. It's a standard stdio MCP server, so other MCP clients (the Claude desktop chat, Cursor, Codex) can run `insta-edits serve` too, though we've only tested Claude Code.
+
 ## What you get
 
 - **The full editor.** Claude receives `notifications/tools/list_changed` as soon as Edits moves between home (32 tools) and the editor (274). Without the bridge, that notification never arrives.
@@ -166,6 +168,12 @@ Edits updates often and its automation server is undocumented. If a new build br
 - Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
 
 ## FAQ
+
+**How do I connect Claude to Instagram Edits?** Install Edits for Mac, switch on Settings › Automation › Enable Automation Server, then add this plugin with the two `/plugin` lines under [Install](#install). Claude can then open your projects and edit them.
+
+**Can Claude edit Instagram Reels?** Yes, inside Edits for Mac. It can import clips, cut them on the beat, add captions, text, transitions, zooms and speed ramps, check rendered frames and export. You post the reel from Edits yourself.
+
+**Does it work with claude.ai in the browser?** No. Edits runs on your Mac and only listens locally, so it needs Claude Code (or another MCP client) running on the same Mac.
 
 **Is this official?** No. It's an independent open-source project, not affiliated with or endorsed by Meta, Instagram or Anthropic. "Instagram" and "Edits" are trademarks of Meta Platforms, Inc.
 

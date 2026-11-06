@@ -2,7 +2,7 @@
   "name": "insta-edits",
   "displayName": "Insta Edits for Claude",
   "version": "0.1.0",
-  "description": "Drive Instagram Edits for Mac from Claude Code with the full editor: keeps Claude's tool list in sync as Edits swaps 32 home tools for 274 editor tools, and keeps your token in the keychain.",
+  "description": "Let Claude edit your Instagram Reels in Edits for Mac: cut to the beat, captions, text, transitions, zooms and export, with the full 274-tool editor. Keeps Claude's tool list in sync and your token in the keychain.",
   "author": {
     "name": "Faisal Khan",
     "url": "https://github.com/faisalkhanzemi"
@@ -10,7 +10,21 @@
   "homepage": "https://github.com/faisalkhanzemi/insta-edits-for-claude",
   "repository": "https://github.com/faisalkhanzemi/insta-edits-for-claude",
   "license": "MIT",
-  "keywords": ["instagram", "edits", "reels", "video-editing", "mcp"],
+  "keywords": [
+    "instagram",
+    "instagram-edits",
+    "edits",
+    "reels",
+    "instagram-reels",
+    "video-editing",
+    "video-editor",
+    "captions",
+    "content-creator",
+    "mcp",
+    "mcp-server",
+    "macos",
+    "claude-code"
+  ],
   "userConfig": {
     "edits_token": {
       "type": "string",
@@ -23,7 +37,11 @@
   "mcpServers": {
     "edits": {
       "command": "python3",
-      "args": ["-m", "insta_edits", "serve"],
+      "args": [
+        "-m",
+        "insta_edits",
+        "serve"
+      ],
       "env": {
         "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT}/src",
         "EDITS_MCP_TOKEN": "${user_config.edits_token}"

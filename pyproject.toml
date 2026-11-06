@@ -5,13 +5,13 @@ build-backend = "hatchling.build"
 [project]
 name = "insta-edits"
 version = "0.1.0"
-description = "Connect Claude Code and other MCP clients to Instagram Edits for Mac's automation server."
+description = "Let Claude Code and other MCP clients edit Instagram Reels in Edits for Mac, through its built-in MCP server."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Faisal Khan" }]
-keywords = ["mcp", "model-context-protocol", "instagram", "edits", "reels", "video-editing", "claude-code"]
+keywords = ["instagram", "instagram-edits", "edits", "reels", "instagram-reels", "video-editing", "mcp", "mcp-server", "model-context-protocol", "claude", "claude-code", "macos"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Environment :: Console",
