@@ -130,11 +130,9 @@ def run_doctor() -> Report:
     )
     result = tools_reply.get("result") or {}
     tools = result.get("tools") or []
-    report.add(
-        "Tools",
-        "ok" if tools else "warn",
-        f"{len(tools)} on the current screen (Edits offers more once a project is open)",
-    )
+    in_editor = any(t.get("name") == "addText" for t in tools)
+    where = "a project is open" if in_editor else "home screen; Edits offers more once a project is open"
+    report.add("Tools", "ok" if tools else "warn", f"{len(tools)} on the current screen ({where})")
     report.add(
         "Reply format",
         "ok",

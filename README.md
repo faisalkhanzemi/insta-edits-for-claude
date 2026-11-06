@@ -101,7 +101,7 @@ insta-edits 0.1.0 doctor
   ✓ Automation server          answering at http://127.0.0.1:19501/mcp (HTTP 403 without a token, as expected)
   ✓ Access token               from ~/.config/insta-edits/token
   ✓ Sign-in                    metapilot-native 1.0.0, protocol 2025-06-18
-  ✓ Tools                      32 on the current screen (Edits offers more once a project is open)
+  ✓ Tools                      32 on the current screen (home screen; Edits offers more once a project is open)
   ✓ Reply format               normalised for older Claude Code builds (resultType without caching fields)
   ✓ Edits automation schema    2026.10.19-1
   ✓ Tool-change notifications  Edits announces them but never sends any; the bridge checks after each call and tells Claude
