@@ -186,11 +186,9 @@ pytest && ruff check . && ruff format --check .
 
 The tests run against `tests/fake_edits.py`, a stand-in that behaves like the real server: it sends no notifications, changes its tool set when a project opens, and replies with `resultType`. You don't need a Mac or Edits to run them. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Acknowledgements
+## Credits
 
 Demo footage: stock clips from [Pexels](https://www.pexels.com/license/) (Pexels License). Music: "Tech House vibes" by Alejandro Magaña, [Mixkit](https://mixkit.co/license/) (Mixkit License).
-
-Thanks to [iamjeeth/claude-edits-skill](https://github.com/iamjeeth/claude-edits-skill) for the early field notes on Edits' automation server.
 
 ## License
 
