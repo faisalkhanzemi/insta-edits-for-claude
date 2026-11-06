@@ -1,0 +1,33 @@
+name: Bug report
+description: Something doesn't work between Claude and Edits
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Never paste your Edits access token here. The doctor output below contains no secrets."
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you asked Claude to do, and what it did instead.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `insta-edits doctor --json`
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: edits
+    attributes:
+      label: Edits version
+      description: Edits > About Edits
+    validations:
+      required: true
+  - type: input
+    id: claude
+    attributes:
+      label: Claude Code version
+      description: Output of `claude --version`

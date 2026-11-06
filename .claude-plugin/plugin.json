@@ -1,0 +1,33 @@
+{
+  "name": "insta-edits",
+  "displayName": "Insta Edits for Claude",
+  "version": "0.1.0",
+  "description": "Drive Instagram Edits for Mac from Claude Code with the full editor: keeps Claude's tool list in sync as Edits swaps 32 home tools for 274 editor tools, and keeps your token in the keychain.",
+  "author": {
+    "name": "Faisal Khan",
+    "url": "https://github.com/faisalkhanzemi"
+  },
+  "homepage": "https://github.com/faisalkhanzemi/insta-edits-for-claude",
+  "repository": "https://github.com/faisalkhanzemi/insta-edits-for-claude",
+  "license": "MIT",
+  "keywords": ["instagram", "edits", "reels", "video-editing", "mcp"],
+  "userConfig": {
+    "edits_token": {
+      "type": "string",
+      "title": "Edits access token",
+      "description": "In Edits: Settings > Automation > Enable Automation Server, then copy the Access token. Stored in your system keychain, never in a file or a chat.",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "mcpServers": {
+    "edits": {
+      "command": "python3",
+      "args": ["-m", "insta_edits", "serve"],
+      "env": {
+        "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT}/src",
+        "EDITS_MCP_TOKEN": "${user_config.edits_token}"
+      }
+    }
+  }
+}

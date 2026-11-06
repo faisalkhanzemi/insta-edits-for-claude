@@ -1,0 +1,17 @@
+{
+  "name": "insta-edits",
+  "owner": {
+    "name": "Faisal Khan",
+    "url": "https://github.com/faisalkhanzemi"
+  },
+  "description": "Connect Claude Code to Instagram Edits for Mac.",
+  "plugins": [
+    {
+      "name": "insta-edits",
+      "source": "./",
+      "description": "Drive Instagram Edits for Mac from Claude Code with the full editor: keeps Claude's tool list in sync as Edits swaps 32 home tools for 274 editor tools, and keeps your token in the keychain.",
+      "category": "media",
+      "tags": ["instagram", "edits", "reels", "video-editing", "mcp"]
+    }
+  ]
+}
