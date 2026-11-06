@@ -1,0 +1,86 @@
+name: Release
+
+# Publishes a GitHub release to PyPI (Trusted Publishing, no stored token) and then to the
+# official MCP Registry (GitHub OIDC, no stored token). Re-run by hand with "Run workflow".
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "build>=1.2" "twine>=5"
+      - run: python -m build
+      - run: twine check --strict dist/*
+      - name: Version in the package, server.json and plugin must match
+        run: |
+          python - <<'EOF'
+          import json, tomllib
+          v = tomllib.load(open("pyproject.toml", "rb"))["project"]["version"]
+          s = json.load(open("server.json"))
+          p = json.load(open(".claude-plugin/plugin.json"))
+          found = {"pyproject": v, "server.json": s["version"], "server.json package": s["packages"][0]["version"], "plugin.json": p["version"]}
+          print(found)
+          assert len(set(found.values())) == 1, found
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/insta-edits/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+
+  mcp-registry:
+    needs: pypi
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download mcp-publisher and check it against the release checksums
+        run: |
+          base="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          ver="${MCP_PUBLISHER_VERSION#v}"
+          curl -fsSL -o mcp-publisher_linux_amd64.tar.gz "$base/mcp-publisher_linux_amd64.tar.gz"
+          curl -fsSL -o checksums.txt "$base/registry_${ver}_checksums.txt"
+          grep " mcp-publisher_linux_amd64.tar.gz$" checksums.txt | sha256sum --check -
+          tar xzf mcp-publisher_linux_amd64.tar.gz mcp-publisher
+          rm -f mcp-publisher_linux_amd64.tar.gz checksums.txt
+      - name: Wait until PyPI serves this version
+        run: |
+          v=$(python3 -c "import json; print(json.load(open('server.json'))['version'])")
+          for i in $(seq 1 30); do
+            if curl -fsS "https://pypi.org/pypi/insta-edits/$v/json" >/dev/null; then echo "PyPI has $v"; exit 0; fi
+            sleep 10
+          done
+          echo "PyPI never served insta-edits $v" >&2; exit 1
+      - run: ./mcp-publisher validate
+      - run: ./mcp-publisher login github-oidc
+      - run: ./mcp-publisher publish

@@ -1,15 +1,17 @@
 # Insta Edits for Claude
 
+<!-- mcp-name: io.github.faisalkhanzemi/insta-edits -->
+
 **Let Claude Code edit in Instagram Edits for Mac, with the full editor and not just the home screen.**
 
 [![CI](https://github.com/faisalkhanzemi/insta-edits-for-claude/actions/workflows/ci.yml/badge.svg)](https://github.com/faisalkhanzemi/insta-edits-for-claude/actions/workflows/ci.yml)
 ![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)
 ![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)
-[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](https://github.com/faisalkhanzemi/insta-edits-for-claude/blob/main/LICENSE)
 
-<p align="center"><a href="assets/hero.mp4"><img src="assets/hero.gif" alt="A real Claude Code session making a beat-synced Dubai in 15 seconds reel inside Instagram Edits for Mac: clips cut on the beat, punch-in zooms, a speed ramp, a title and labels, frame checks, then export" width="100%"></a></p>
+<p align="center"><a href="https://github.com/faisalkhanzemi/insta-edits-for-claude/blob/main/assets/hero.mp4"><img src="https://raw.githubusercontent.com/faisalkhanzemi/insta-edits-for-claude/main/assets/hero.gif" alt="A real Claude Code session making a beat-synced Dubai in 15 seconds reel inside Instagram Edits for Mac: clips cut on the beat, punch-in zooms, a speed ramp, a title and labels, frame checks, then export" width="100%"></a></p>
 
-<p align="center"><sub>One prompt, a real Claude Code session, nothing scripted. Edits found no beats, so Claude analysed the music itself (122 BPM), cut every clip on a beat, checked its own frames and exported the reel. <a href="assets/hero.mp4">Watch with sound</a>.</sub></p>
+<p align="center"><sub>One prompt, a real Claude Code session, nothing scripted. Edits found no beats, so Claude analysed the music itself (122 BPM), cut every clip on a beat, checked its own frames and exported the reel. <a href="https://github.com/faisalkhanzemi/insta-edits-for-claude/blob/main/assets/hero.mp4">Watch with sound</a>.</sub></p>
 
 Edits for Mac, which Meta launched on 5 November 2026, has a built-in automation server that speaks MCP: in Meta's words, you can connect AI agents "to the desktop editor through MCP so they can help with your projects". You can point Claude Code at it directly, but you only get part of it.
 
@@ -165,7 +167,7 @@ Edits updates often and its automation server is undocumented. If a new build br
 - The bridge only connects to the URL you configure, which defaults to `127.0.0.1`. It sends nothing anywhere else and has no telemetry.
 - The token is redacted in every log line, error message and `repr`. `doctor --json` reports where the token came from, never its value.
 - Edits is signed in to your Instagram account. The bundled skill tells Claude never to publish, share or schedule without your explicit go-ahead for that specific post.
-- Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+- Report vulnerabilities privately as described in [SECURITY.md](https://github.com/faisalkhanzemi/insta-edits-for-claude/blob/main/SECURITY.md).
 
 ## FAQ
 
@@ -192,7 +194,7 @@ pip install -e . pytest ruff
 pytest && ruff check . && ruff format --check .
 ```
 
-The tests run against `tests/fake_edits.py`, a stand-in that behaves like the real server: it sends no notifications, changes its tool set when a project opens, and replies with `resultType`. You don't need a Mac or Edits to run them. See [CONTRIBUTING.md](CONTRIBUTING.md).
+The tests run against `tests/fake_edits.py`, a stand-in that behaves like the real server: it sends no notifications, changes its tool set when a project opens, and replies with `resultType`. You don't need a Mac or Edits to run them. See [CONTRIBUTING.md](https://github.com/faisalkhanzemi/insta-edits-for-claude/blob/main/CONTRIBUTING.md).
 
 ## Credits
 
@@ -200,4 +202,4 @@ Demo footage: stock clips from [Pexels](https://www.pexels.com/license/) (Pexels
 
 ## License
 
-[MIT](LICENSE) © Faisal Khan
+[MIT](https://github.com/faisalkhanzemi/insta-edits-for-claude/blob/main/LICENSE) © Faisal Khan
