@@ -5,6 +5,8 @@
 **Let Claude Code edit in Instagram Edits for Mac, with the full editor and not just the home screen.**
 
 [![CI](https://github.com/faisalkhanzemi/insta-edits-for-claude/actions/workflows/ci.yml/badge.svg)](https://github.com/faisalkhanzemi/insta-edits-for-claude/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/insta-edits)](https://pypi.org/project/insta-edits/)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.faisalkhanzemi%2Finsta--edits-blue)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.faisalkhanzemi/insta-edits)
 ![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)
 ![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)
 [![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](https://github.com/faisalkhanzemi/insta-edits-for-claude/blob/main/LICENSE)
@@ -78,7 +80,7 @@ A plugin installed this way, at user scope, also shows up in the Code tab of the
 ### 2b. As a standalone MCP server
 
 ```bash
-pipx install git+https://github.com/faisalkhanzemi/insta-edits-for-claude
+pipx install insta-edits
 ```
 
 ```bash
