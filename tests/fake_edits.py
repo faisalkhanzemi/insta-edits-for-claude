@@ -4,7 +4,8 @@
 - issues an Mcp-Session-Id on initialize and declares `tools.listChanged`
 - marks every result `"resultType": "complete"` without the caching fields newer schemas expect
 - swaps its tool set when a project opens, like Edits (home tools -> editor tools)
-- by default has NO notification stream and never sends tools/list_changed, like Edits
+- by default has NO notification stream and never sends tools/list_changed, like Edits: a GET for the
+  stream gets 403 even with a valid token and session (measured against the real app, 7 Nov 2026)
 - options: answer in text/event-stream, offer a GET stream that does notify, send bad cacheScope hints
 """
 
@@ -36,6 +37,7 @@ class FakeEdits:
         self.session = "sess-1"
         self.notifications: queue.Queue = queue.Queue()
         self.received = []
+        self.stream_requests = 0
         fake = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -56,9 +58,14 @@ class FakeEdits:
             def do_GET(self):
                 if not self._auth_ok():
                     return
+                fake.stream_requests += 1
                 if not fake.stream:
-                    self.send_response(405)
+                    body = json.dumps({"error": "forbidden"}).encode()
+                    self.send_response(403)  # what Edits answers, not the 405 the spec suggests
+                    self.send_header("Content-Type", "application/json")
+                    self.send_header("Content-Length", str(len(body)))
                     self.end_headers()
+                    self.wfile.write(body)
                     return
                 self.send_response(200)
                 self.send_header("Content-Type", "text/event-stream")

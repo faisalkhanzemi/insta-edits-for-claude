@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+- The bridge no longer retries Edits' notification stream forever. Edits answers the stream request with 403 even with a valid token (measured on 7 Nov 2026; the spec suggests 405), so 403 now means "no stream", like 404 and 405. Before, the bridge asked again every 30 seconds for the whole session. Tool changes were never affected, because the bridge checks the tools itself.
+
+### Tests
+- The fake Edits server answers the stream request with 403, the way the real app does, and a new test checks the bridge asks only once.
+
 ### Documentation
 - Install: each `/plugin` command in its own copy box, a "before you start" line, and a plain-English install request for people who'd rather ask Claude.
 - New "Update or uninstall" section.

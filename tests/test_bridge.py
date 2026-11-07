@@ -165,6 +165,16 @@ def test_no_stream_is_fine():
         b.close()
 
 
+def test_refused_stream_is_asked_for_once_not_retried():
+    with FakeEdits() as edits:  # like the real Edits: GET for the stream gets 403
+        b = BridgeProcess(edits.url)
+        b.send(INIT)
+        b.wait_for(lambda m: m.get("id") == 1)
+        time.sleep(2.5)  # the retry backoff starts at 1 s, so a retrying bridge would have asked again
+        assert edits.stream_requests == 1
+        b.close()
+
+
 def test_bad_token_becomes_a_clear_jsonrpc_error():
     with FakeEdits() as edits:
         b = BridgeProcess(edits.url, token="wrong")

@@ -8,6 +8,10 @@ import urllib.error
 import urllib.request
 from typing import Any, Callable, Iterable, Iterator, List, Optional
 
+# Answers to the GET notification stream that mean "there is no stream", so don't retry.
+# Edits 454 answers 403 even with a valid token and session (measured 7 Nov 2026); the spec says 405.
+NO_STREAM = (403, 404, 405)
+
 
 class EditsError(Exception):
     """The Edits server could not be used."""
@@ -106,7 +110,7 @@ class EditsClient:
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 return response.status == 200
         except urllib.error.HTTPError as err:
-            return False if err.code in (404, 405) else None
+            return False if err.code in NO_STREAM else None
         except Exception:
             return None
 
@@ -128,8 +132,8 @@ class EditsClient:
                         if stop.is_set():
                             return
             except urllib.error.HTTPError as err:
-                if err.code in (404, 405):
-                    log("server has no notification stream; tool-list changes will show on the next request")
+                if err.code in NO_STREAM:
+                    log(f"Edits has no notification stream (HTTP {err.code}); the bridge checks the tools itself")
                     return
                 log(f"notification stream error HTTP {err.code}; retrying")
             except Exception as err:  # connection dropped, Edits restarted, etc.
