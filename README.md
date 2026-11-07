@@ -47,20 +47,31 @@ Claude Code ──stdio──▶ insta-edits ──HTTP──▶ Edits for Mac (
 
 ## Install
 
+**Before you start:** Edits for Mac is open and signed in, and Claude Code is installed. Setup takes about two minutes.
+
 ### 1. Turn on the automation server in Edits
 
 Go to **Edits › Settings › Automation**, switch on **Enable Automation Server**, and copy the **Access token**. Keep Edits open while Claude works.
 
 ### 2a. As a Claude Code plugin (recommended)
 
-Start `claude` in a terminal and type:
+Start `claude` in a terminal and run these two commands, one at a time:
 
 ```
 /plugin marketplace add faisalkhanzemi/insta-edits-for-claude
+```
+
+```
 /plugin install insta-edits@insta-edits
 ```
 
 Claude Code asks for the access token with a masked prompt and stores it in your keychain. Restart Claude Code, then run `/mcp`: `edits` should show as connected. The plugin also installs the `edits` skill.
+
+Rather just ask? Paste this into Claude Code as a normal message:
+
+> Install the Insta Edits plugin from github.com/faisalkhanzemi/insta-edits-for-claude
+
+Claude runs the same two install steps from its terminal. That route can't show the masked token prompt, so finish with `/plugin configure insta-edits@insta-edits` and paste the token there, never into the chat.
 
 <details>
 <summary>Installing from a shell script, or using the Claude desktop app</summary>
@@ -101,7 +112,7 @@ insta-edits doctor
 ```
 
 ```
-insta-edits 0.1.0 doctor
+insta-edits 0.1.1 doctor
 
   ✓ macOS                      27.0.1
   ✓ Edits app installed        /Applications/Edits.app
@@ -117,6 +128,20 @@ All good. Claude can drive Edits.
 ```
 
 Each `✗` line names its fix. Plugin users who want `doctor` can install the CLI as in 2b. The plugin token lives in the keychain, so without `set-token` the doctor checks stop at the sign-in step.
+
+## Update or uninstall
+
+Plugin:
+
+```bash
+claude plugin marketplace update insta-edits && claude plugin update insta-edits@insta-edits
+```
+
+```bash
+claude plugin uninstall insta-edits@insta-edits && claude plugin marketplace remove insta-edits
+```
+
+Standalone server: `pipx upgrade insta-edits` to update; `claude mcp remove edits`, `pipx uninstall insta-edits` and `rm -r ~/.config/insta-edits` to remove it. You can also switch off the automation server in Edits at any time, which cuts the connection.
 
 ## Using it
 

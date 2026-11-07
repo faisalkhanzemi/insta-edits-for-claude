@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Documentation
+- Install: each `/plugin` command in its own copy box, a "before you start" line, and a plain-English install request for people who'd rather ask Claude.
+- New "Update or uninstall" section.
+- The `doctor` example shows the current version.
+
 ## [0.1.1] - 2026-11-07
 
 ### Added
