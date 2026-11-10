@@ -4,16 +4,27 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-10
+
 ### Fixed
+- Speed curves: Edits' catalog (`getCapabilities`, `listCatalogKinds`, `getCatalogItem`, `listCatalog`) names `selectSpeedPanelPreset` as the tool for speed-curve presets, but that tool's own description says it is deprecated, refused and crashed the app. The bridge now points those entries at `setSpeedCurve`, which takes the same preset and works (tested on Edits 455), so any client that follows the catalog lands on the working tool. `doctor` reports which tool Edits names, so it shows when Edits fixes this itself.
 - The bridge no longer retries Edits' notification stream forever. Edits answers the stream request with 403 even with a valid token (measured on 7 Nov 2026; the spec suggests 405), so 403 now means "no stream", like 404 and 405. Before, the bridge asked again every 30 seconds for the whole session. Tool changes were never affected, because the bridge checks the tools itself.
 
+### Added
+- `doctor` shows the installed Edits version, for example `455.0.0 at /Applications/Edits.app`, which makes bug reports and before/after checks of an Edits update easier.
+
 ### Tests
+- Unit tests for the speed-curve catalog fix (catalog lists, single items, structured content, and mentions that must pass through), an end-to-end test through the bridge, and a `doctor` check of it. The fake Edits server's `getCapabilities` now carries the speed-curve catalog entry like the real app.
+- `doctor` reads the version from a stand-in app bundle, and still passes when it can't read one.
 - The fake Edits server answers the stream request with 403, the way the real app does, and a new test checks the bridge asks only once.
 
 ### Documentation
 - Install: each `/plugin` command in its own copy box, a "before you start" line, and a plain-English install request for people who'd rather ask Claude.
 - New "Update or uninstall" section.
 - The `doctor` example shows the current version.
+- Skill: apply speed curves with `setSpeedCurve`. Edits' catalog points speed-curve presets at `selectSpeedPanelPreset`, a tool whose own description says it is deprecated, refused and crashed the app (seen on 454 and 455). Tested on 455: `setSpeedCurve` with `HERO` applied the 8-point curve, shortened the clip and moved the next clips up.
+- Skill: the automation server has no tool that posts, so posting is handed to the user in Edits' share screen (checked on 454 and 455).
+- Tested with Edits 455.0.0: same 274 editor tools, descriptions and arguments as 454, notification stream still refused with 403.
 
 ## [0.1.1] - 2026-11-07
 
@@ -35,5 +46,6 @@ All notable changes to this project are documented here. The format follows [Kee
 - `doctor` command (with `--json` for bug reports) and `set-token` (hidden prompt, file saved with 0600 permissions).
 - Claude Code plugin with a keychain-stored token prompt, a marketplace manifest, and an `edits` skill with notes measured against Edits 454: sandboxed import folders, absolute paths, HDR projects, beat detection fallback, keyframe and export formats, and library music in automation exports.
 
+[0.1.2]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.2
 [0.1.1]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.1
 [0.1.0]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.0

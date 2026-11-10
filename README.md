@@ -32,6 +32,7 @@ Claude Code ──stdio──▶ insta-edits ──HTTP──▶ Edits for Mac (
 
 - **The full editor.** Claude receives `notifications/tools/list_changed` as soon as Edits moves between home (32 tools) and the editor (274). Without the bridge, that notification never arrives.
 - **Replies that every Claude Code build accepts.** Edits marks each result `"resultType": "complete"` without the caching fields that newer MCP schemas pair with it. Some Claude Code builds then dropped every tool, with `Invalid result for tools/list: ttlMs … cacheScope`. The bridge removes the marker only when those fields are missing.
+- **Speed curves that work.** Edits' catalog says to apply speed-curve presets with `selectSpeedPanelPreset`, a tool whose own description says it is deprecated, refused and crashed the app. The bridge points those catalog entries at `setSpeedCurve`, which takes the same preset and works (tested on Edits 455).
 - **Your token stays private.** The plugin keeps it in the macOS keychain. The CLI keeps it in a `0600` file. It never appears in `~/.claude.json`, in logs or in error messages.
 - **Start in any order.** If Edits isn't open yet, the bridge still connects and reports no tools, then tells Claude the moment Edits answers, so the editor appears without a restart.
 - **Errors you can act on.** "Cannot reach Edits: open it and enable the Automation Server" replaces a stack trace. A rejected token says how to update it.
@@ -112,16 +113,17 @@ insta-edits doctor
 ```
 
 ```
-insta-edits 0.1.1 doctor
+insta-edits 0.1.2 doctor
 
   ✓ macOS                      27.0.1
-  ✓ Edits app installed        /Applications/Edits.app
+  ✓ Edits app installed        455.0.0 at /Applications/Edits.app
   ✓ Automation server          answering at http://127.0.0.1:19501/mcp (HTTP 403 without a token, as expected)
   ✓ Access token               from ~/.config/insta-edits/token
   ✓ Sign-in                    metapilot-native 1.0.0, protocol 2025-06-18
   ✓ Tools                      32 on the current screen (home screen; Edits offers more once a project is open)
   ✓ Reply format               normalised for older Claude Code builds (resultType without caching fields)
   ✓ Edits automation schema    2026.10.19-1
+  ✓ Speed-curve catalog        Edits points it at selectSpeedPanelPreset, which it says is refused; the bridge points it at setSpeedCurve
   ✓ Tool-change notifications  Edits announces them but never sends any; the bridge checks after each call and tells Claude
 
 All good. Claude can drive Edits.
@@ -160,7 +162,7 @@ Claude opens the project, the editor tools appear, and it works from them. It do
 | Step | What happens |
 | --- | --- |
 | Session | The bridge forwards `initialize`, keeps Edits' `Mcp-Session-Id`, and sends `MCP-Protocol-Version` on every request. |
-| Replies | It accepts both JSON and `text/event-stream` replies and batch requests, and normalises `resultType` only when the caching fields are missing. |
+| Replies | It accepts both JSON and `text/event-stream` replies and batch requests, normalises `resultType` only when the caching fields are missing, and points the speed-curve catalog entries at `setSpeedCurve`. |
 | Tool sync | After each `tools/call` it sends its own `tools/list` to Edits, using an id Claude never sees, and compares the tool names. If they changed, it writes `notifications/tools/list_changed` to Claude. Turn this off with `serve --no-sync`. |
 | Notifications | If a future Edits build opens a server-to-client stream, the bridge listens on it and forwards what arrives. Edits doesn't offer one today, so the bridge stops trying after the first refusal. Turn it off with `serve --no-stream`. |
 | Edits closed | The bridge answers `initialize` itself, reports no tools and retries Edits every 5 seconds (`INSTA_EDITS_OFFLINE_POLL`). When Edits answers, it opens the session and sends `notifications/tools/list_changed`. |
@@ -172,7 +174,7 @@ Settings come from the environment: `EDITS_MCP_URL` (default `http://127.0.0.1:1
 
 | | Version |
 | --- | --- |
-| Edits for Mac | 454.0.0 (server `metapilot-native` 1.0.0, automation schema 2026.10.19-1) |
+| Edits for Mac | 454.0.0 and 455.0.0 (server `metapilot-native` 1.0.0, automation schema 2026.10.19-1; 455 has the same 274 editor tools and arguments as 454) |
 | Claude Code | 2.1.296 |
 | macOS | 27.0.1 |
 | Python | 3.9.6 (system), 3.11, 3.13 in CI |

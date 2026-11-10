@@ -4,6 +4,7 @@
 - issues an Mcp-Session-Id on initialize and declares `tools.listChanged`
 - marks every result `"resultType": "complete"` without the caching fields newer schemas expect
 - swaps its tool set when a project opens, like Edits (home tools -> editor tools)
+- lists speed-curve presets in getCapabilities under selectSpeedPanelPreset, like Edits
 - by default has NO notification stream and never sends tools/list_changed, like Edits: a GET for the
   stream gets 403 even with a valid token and session (measured against the real app, 7 Nov 2026)
 - options: answer in text/event-stream, offer a GET stream that does notify, send bad cacheScope hints
@@ -24,6 +25,15 @@ HOME_TOOLS = [
     {"name": "getCapabilities", "inputSchema": {"type": "object"}},
 ]
 EDITOR_TOOLS = HOME_TOOLS + [{"name": "addText", "inputSchema": {"type": "object"}}]
+# Like Edits 454/455: the speed-curve catalog points at a tool whose own description says it is refused.
+CAPABILITIES = {
+    "ok": True,
+    "schemaVersion": "2026.10.19-1",
+    "catalogs": [
+        {"kind": "filter", "applyTool": "applyFilter", "applyParam": "filter", "count": 77},
+        {"kind": "speedCurvePreset", "applyTool": "selectSpeedPanelPreset", "applyParam": "preset", "count": 8},
+    ],
+}
 
 
 class FakeEdits:
@@ -142,9 +152,7 @@ class FakeEdits:
                 return {
                     "jsonrpc": "2.0",
                     "id": mid,
-                    "result": {
-                        "content": [{"type": "text", "text": json.dumps({"ok": True, "schemaVersion": "2026.10.19-1"})}]
-                    },
+                    "result": {"content": [{"type": "text", "text": json.dumps(CAPABILITIES, indent=2)}]},
                 }
             return {
                 "jsonrpc": "2.0",

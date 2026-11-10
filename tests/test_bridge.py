@@ -175,6 +175,21 @@ def test_refused_stream_is_asked_for_once_not_retried():
         b.close()
 
 
+def test_speed_catalog_reaches_the_client_pointing_at_set_speed_curve():
+    with FakeEdits() as edits:
+        b = BridgeProcess(edits.url)
+        b.send(INIT)
+        b.wait_for(lambda m: m.get("id") == 1)
+        b.send(
+            {"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "getCapabilities", "arguments": {}}}
+        )
+        caps = json.loads(b.wait_for(lambda m: m.get("id") == 2)["result"]["content"][0]["text"])
+        speed = next(c for c in caps["catalogs"] if c["kind"] == "speedCurvePreset")
+        assert speed["applyTool"] == "setSpeedCurve"
+        assert caps["schemaVersion"] == "2026.10.19-1"
+        b.close()
+
+
 def test_bad_token_becomes_a_clear_jsonrpc_error():
     with FakeEdits() as edits:
         b = BridgeProcess(edits.url, token="wrong")

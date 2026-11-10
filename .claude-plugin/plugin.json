@@ -1,7 +1,7 @@
 {
   "name": "insta-edits",
   "displayName": "Insta Edits for Claude",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Let Claude edit your Instagram Reels in Edits for Mac: cut to the beat, captions, text, transitions, zooms and export, with the full 274-tool editor. Keeps Claude's tool list in sync and your token in the keychain.",
   "author": {
     "name": "Faisal Khan",

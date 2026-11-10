@@ -17,7 +17,7 @@ It is undocumented and updated weekly, so treat the live tool list and `getCapab
 ## How the server behaves
 
 - **The tool list follows the screen.** About 30 tools on the home screen (projects, import, catalogs); the editing tools appear once a project is open. Call `appState` to see the screen, then `projects` and `openProject` (or `newProject`). Edits never announces the change itself; the bridge checks after each call and tells Claude, so the new tools show up without reconnecting. If they don't, call `tools/list` again or check that `edits` runs through the bridge.
-- **Discover, don't guess.** `getCapabilities` returns conventions, catalogs and recipes. `listCatalogKinds`, `listCatalog` and `getCatalogItem` say which value each `apply…` tool accepts (effects, filters, LUTs, transitions, text animations and presets, caption styles, fonts, speed curves, masks).
+- **Discover, don't guess.** `getCapabilities` returns conventions, catalogs and recipes. `listCatalogKinds`, `listCatalog` and `getCatalogItem` say which value each `apply…` tool accepts (effects, filters, LUTs, transitions, text animations and presets, caption styles, fonts, speed curves, masks). Speed curves: apply them with `setSpeedCurve` (`id`, `preset`), using the ids from `listSpeedCurvePresets`. Edits' own catalog names `selectSpeedPanelPreset`, a tool whose description says it is deprecated, refused and crashed the app; the bridge rewrites that entry to `setSpeedCurve`, but if you ever see the old name, don't call `selectSpeedPanelPreset` or `dragSpeedPanelCurve`.
 - **Conventions:** time is seconds on the composition timeline; the canvas is normalised 0-1 from the top-left with x/y at the element's centre; colours are `#RRGGBB` or `#RRGGBBAA`; rotation is degrees clockwise.
 - **Edits is sandboxed.** `Sandbox bookmark unavailable` means Edits may not read that folder. `~/Movies` works; `~/Downloads`, `~/Desktop`, temp folders and project folders do not. Copy the footage into `~/Movies` first, and export into `~/Movies` too. You cannot write into Edits' own container either: macOS blocks it.
 - **Paths must be absolute.** Edits doesn't expand `~`: pass `/Users/<name>/Movies/...`.
@@ -29,7 +29,7 @@ It is undocumented and updated weekly, so treat the live tool list and `getCapab
 
 ## Rules for the user's account
 
-- **Never publish, share or schedule anything without the user's explicit go-ahead for that specific post.** Edits signs in to the user's Instagram account.
+- **Never publish, share or schedule anything without the user's explicit go-ahead for that specific post.** Edits signs in to the user's Instagram account. The automation server has no tool that posts, shares or schedules: posting happens in Edits' own share screen, so hand that step to the user.
 - Ask before deleting a project (`deleteProject`); prefer `duplicateProject` to experiment.
 - **Library songs do not survive an automation export.** Songs added with `addSongToComposition` come in as licensed, even ones the catalog lists as royalty-free, and `export` writes silence where they play. The user's own audio files (`addMedia` with `audioKind`) export fine. When a library song matters, leave the final export or post to the Edits window, and say so.
 - Add a library song by its exact title: passing a track id sometimes adds a different song. Check the result with `elements`.

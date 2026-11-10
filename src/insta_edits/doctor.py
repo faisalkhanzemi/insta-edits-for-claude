@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import platform
+import plistlib
 import shutil
 import subprocess
 from dataclasses import asdict, dataclass, field
@@ -51,6 +52,16 @@ def _edits_app() -> Optional[str]:
     return None
 
 
+def _app_version(app: str) -> Optional[str]:
+    """The Edits version from the app bundle (e.g. "455.0.0"), or None if it can't be read."""
+    try:
+        with open(Path(app) / "Contents" / "Info.plist", "rb") as f:
+            version = plistlib.load(f).get("CFBundleShortVersionString")
+    except (OSError, plistlib.InvalidFileException, ValueError):
+        return None
+    return str(version) if version else None
+
+
 def run_doctor() -> Report:
     report = Report()
     url = config.server_url()
@@ -61,7 +72,11 @@ def run_doctor() -> Report:
         report.add("macOS", "warn", f"{platform.system()}: Edits for Mac only runs on macOS (Apple silicon)")
 
     app = _edits_app() if platform.system() == "Darwin" else None
-    report.add("Edits app installed", "ok" if app else "fail", app or "not found; download it from edits.com/desktop")
+    if app:
+        version = _app_version(app)
+        report.add("Edits app installed", "ok", f"{version} at {app}" if version else app)
+    else:
+        report.add("Edits app installed", "fail", "not found; download it from edits.com/desktop")
 
     probe = EditsClient(url, token=None, timeout=5)
     try:
@@ -162,11 +177,29 @@ def run_doctor() -> Report:
             c.get("text", "") for c in ((caps.get("result") or {}).get("content") or []) if isinstance(c, dict)
         )
         try:
-            schema = json.loads(text).get("schemaVersion")
+            capabilities = json.loads(text)
+            schema = capabilities.get("schemaVersion")
         except (ValueError, AttributeError):
-            schema = None
+            capabilities, schema = {}, None
         if schema:
             report.add("Edits automation schema", "ok", str(schema))
+        speed = next(
+            (
+                c
+                for c in (capabilities.get("catalogs") or [])
+                if isinstance(c, dict) and c.get("kind") == compat.SPEED_KIND
+            ),
+            None,
+        )
+        if speed and speed.get("applyTool") == compat.BROKEN_SPEED_TOOL:
+            report.add(
+                "Speed-curve catalog",
+                "ok",
+                f"Edits points it at {compat.BROKEN_SPEED_TOOL}, which it says is refused; "
+                f"the bridge points it at {compat.WORKING_SPEED_TOOL}",
+            )
+        elif speed:
+            report.add("Speed-curve catalog", "ok", f"Edits points it at {speed.get('applyTool')}; nothing to fix")
 
     stream = client.stream_supported()
     if stream:
