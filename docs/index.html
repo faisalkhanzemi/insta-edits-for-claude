@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edit Instagram Reels with Claude in Edits for Mac | Insta Edits for Claude</title>
+<meta name="description" content="Free, open-source plugin that lets Claude Code edit in Instagram Edits for Mac with the full 274-tool editor, not just the 32 home-screen tools.">
+<link rel="canonical" href="https://faisalkhanzemi.github.io/insta-edits-for-claude/">
+<meta name="author" content="Faisal Khan">
+<meta name="color-scheme" content="dark light">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Edit Instagram Reels with Claude in Edits for Mac">
+<meta property="og:description" content="A free plugin that gives Claude Code the full Edits editor: beat cuts, captions, text, transitions, speed ramps and export.">
+<meta property="og:url" content="https://faisalkhanzemi.github.io/insta-edits-for-claude/">
+<meta property="og:image" content="https://faisalkhanzemi.github.io/insta-edits-for-claude/poster.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:image:alt" content="A Claude Code session editing a Dubai reel inside Instagram Edits for Mac">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Edit Instagram Reels with Claude in Edits for Mac">
+<meta name="twitter:description" content="A free plugin that gives Claude Code the full Edits editor, not just the home screen.">
+<meta name="twitter:image" content="https://faisalkhanzemi.github.io/insta-edits-for-claude/poster.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f5b301'/%3E%3Cpath d='M12 9l12 7-12 7z' fill='%23111'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Insta Edits for Claude",
+  "alternateName": "insta-edits",
+  "description": "Claude Code plugin and MCP server that lets Claude edit in Instagram Edits for Mac with the full 274-tool editor.",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "macOS (Apple silicon)",
+  "softwareVersion": "0.1.2",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://faisalkhanzemi.github.io/insta-edits-for-claude/",
+  "downloadUrl": "https://github.com/faisalkhanzemi/insta-edits-for-claude",
+  "sameAs": ["https://github.com/faisalkhanzemi/insta-edits-for-claude", "https://pypi.org/project/insta-edits/"],
+  "image": "https://faisalkhanzemi.github.io/insta-edits-for-claude/poster.jpg",
+  "author": {"@type": "Person", "name": "Faisal Khan", "url": "https://github.com/faisalkhanzemi"},
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "How do I connect Claude to Instagram Edits?", "acceptedAnswer": {"@type": "Answer", "text": "Install Edits for Mac, switch on Settings › Automation › Enable Automation Server, then add the Insta Edits plugin in Claude Code with /plugin marketplace add faisalkhanzemi/insta-edits-for-claude and /plugin install insta-edits@insta-edits."}},
+    {"@type": "Question", "name": "Why does Claude only see 32 tools in Edits?", "acceptedAnswer": {"@type": "Answer", "text": "Edits shows 32 tools on its home screen and 274 once a project is open. It says it will tell clients when that changes but never does (measured on Edits 454 and 455), so a client connected straight to Edits keeps the 32 home tools. The plugin checks after every call and tells Claude, so the editor tools appear as soon as a project opens."}},
+    {"@type": "Question", "name": "Can Claude edit Instagram Reels?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, inside Edits for Mac. It can import clips, cut them on the beat, add captions, text, transitions, zooms and speed ramps, check rendered frames and export. You post the reel from Edits yourself."}},
+    {"@type": "Question", "name": "Can Claude post to Instagram for me?", "acceptedAnswer": {"@type": "Answer", "text": "Not through the automation server: Edits 454 and 455 have no tool that posts, shares or schedules. Claude makes and exports the reel, and you post it from the Edits window."}},
+    {"@type": "Question", "name": "Does it work with claude.ai in the browser?", "acceptedAnswer": {"@type": "Answer", "text": "No. Edits runs on your Mac and only listens locally, so it needs Claude Code (or another MCP client) running on the same Mac."}},
+    {"@type": "Question", "name": "What does it cost?", "acceptedAnswer": {"@type": "Answer", "text": "The plugin is free and open source (MIT), and Edits for Mac is free. Claude Code needs a Claude plan or an Anthropic API account."}},
+    {"@type": "Question", "name": "Is this an official Meta or Anthropic product?", "acceptedAnswer": {"@type": "Answer", "text": "No. It's an independent open-source project, not affiliated with or endorsed by Meta, Instagram or Anthropic."}}
+  ]
+}
+</script>
+<style>
+:root {
+  --bg: #0e0e0f; --surface: #18181a; --line: #2a2a2e; --text: #f2f0eb; --muted: #a9a6a0;
+  --accent: #f5b301; --accent-ink: #111; --code-bg: #111113;
+  --radius: 14px; --max: 880px;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #faf8f4; --surface: #ffffff; --line: #e6e2da; --text: #17161a; --muted: #5d5a55;
+    --accent: #b77f00; --accent-ink: #fff; --code-bg: #f1eee8;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; }
+a { color: var(--accent); text-underline-offset: 3px; }
+code, pre, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+header.top { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; font-size: 15px; }
+header.top .brand { color: var(--text); text-decoration: none; font-weight: 650; display: flex; gap: 10px; align-items: center; }
+header.top .brand i { width: 22px; height: 22px; border-radius: 6px; background: var(--accent); display: inline-block; position: relative; }
+header.top .brand i::after { content: ""; position: absolute; left: 8px; top: 6px; border-left: 8px solid var(--accent-ink); border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+header.top nav a { color: var(--muted); text-decoration: none; margin-left: 18px; }
+header.top nav a:hover { color: var(--text); }
+.hero { padding: 40px 0 28px; }
+.eyebrow { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 650; margin: 0 0 14px; }
+h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.08; letter-spacing: -0.02em; margin: 0 0 18px; }
+.lead { font-size: clamp(18px, 2.4vw, 21px); color: var(--muted); margin: 0 0 26px; max-width: 700px; }
+.lead strong { color: var(--text); }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 999px; font-weight: 600; text-decoration: none; font-size: 16px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { border: 1px solid var(--line); color: var(--text); }
+.btn:focus-visible, .copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+figure.demo { margin: 34px 0 8px; }
+figure.demo video { width: 100%; height: auto; display: block; border-radius: var(--radius); border: 1px solid var(--line); background: #000; }
+figure.demo figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 34px 0 0; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.stat b { display: block; font-size: 30px; letter-spacing: -0.02em; line-height: 1.1; }
+.stat span { color: var(--muted); font-size: 14px; }
+section { padding: 46px 0 6px; }
+h2 { font-size: clamp(24px, 3.6vw, 32px); letter-spacing: -0.01em; line-height: 1.2; margin: 0 0 16px; }
+h3 { font-size: 18px; margin: 0 0 6px; }
+p { margin: 0 0 14px; }
+ol.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
+ol.steps > li { counter-increment: s; position: relative; padding: 0 0 22px 52px; }
+ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font-weight: 700; color: var(--accent); }
+.cmd { display: flex; align-items: stretch; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; margin: 8px 0; overflow: hidden; }
+.cmd code { flex: 1; padding: 12px 14px; font-size: 15px; overflow-x: auto; white-space: pre; }
+.copy { border: 0; border-left: 1px solid var(--line); background: transparent; color: var(--muted); padding: 0 14px; cursor: pointer; font: inherit; font-size: 14px; }
+.copy:hover { color: var(--text); }
+.note { font-size: 15px; color: var(--muted); }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.card p { color: var(--muted); font-size: 15px; margin: 0; }
+blockquote { margin: 10px 0; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 10px 10px 0; color: var(--text); }
+details { border-top: 1px solid var(--line); padding: 16px 0; }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; font-weight: 600; font-size: 17px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; color: var(--accent); font-weight: 700; }
+details[open] summary::after { content: "–"; }
+details p { color: var(--muted); margin: 10px 0 0; }
+.table-scroll { overflow-x: auto; }
+.compare { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 15px; }
+.compare th, .compare td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.compare th { color: var(--muted); font-weight: 600; }
+.compare th[scope=row] { width: 26%; min-width: 130px; }
+footer { padding: 50px 0 40px; color: var(--muted); font-size: 14px; }
+footer p { margin: 0 0 8px; }
+@media (max-width: 640px) {
+  .stats, .grid { grid-template-columns: 1fr; }
+  header.top nav a:not(.gh) { display: none; }
+  .cmd code { font-size: 13.5px; }
+  ol.steps > li { padding-left: 44px; }
+  .compare { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="./"><i aria-hidden="true"></i>Insta Edits for Claude</a>
+    <nav aria-label="Main">
+      <a href="#install">Install</a>
+      <a href="#why">Why</a>
+      <a href="#faq">FAQ</a>
+      <a class="gh" href="https://github.com/faisalkhanzemi/insta-edits-for-claude">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <p class="eyebrow">Free · open source · Claude Code plugin</p>
+      <h1>Edit Instagram Reels with Claude in Edits for Mac</h1>
+      <p class="lead">Instagram's free <strong>Edits for Mac</strong> lets AI agents drive its editor. Connected directly, Claude Code only sees the <strong>32 tools</strong> on the home screen. This plugin gives it the <strong>full editor, all 274 tools</strong>: beat cuts, captions, text, transitions, speed ramps and export.</p>
+      <div class="cta">
+        <a class="btn primary" href="#install">Install in 2 minutes</a>
+        <a class="btn ghost" href="https://github.com/faisalkhanzemi/insta-edits-for-claude">View on GitHub</a>
+      </div>
+
+      <figure class="demo">
+        <video controls playsinline preload="metadata" poster="poster.jpg" width="1280" height="720">
+          <source src="demo.mp4" type="video/mp4">
+        </video>
+        <figcaption>One prompt, a real Claude Code session, nothing scripted. Edits found no beats, so Claude analysed the music itself (122 BPM), cut every clip on a beat, checked its own frames and exported the reel. Shown at 15× speed.</figcaption>
+      </figure>
+
+      <div class="stats" role="list">
+        <div class="stat" role="listitem"><b>274</b><span>Edits tools Claude can use, up from 32</span></div>
+        <div class="stat" role="listitem"><b>0</b><span>restarts when you open or close a project</span></div>
+        <div class="stat" role="listitem"><b>MIT</b><span>free, no dependencies, token kept in your keychain</span></div>
+      </div>
+    </div>
+
+    <section id="install" aria-labelledby="install-h">
+      <h2 id="install-h">How to connect Claude to Instagram Edits</h2>
+      <p class="note">You need a Mac with Apple silicon (M1 or later), <a href="https://edits.instagram.com/desktop">Edits for Mac</a> signed in to Instagram, and Claude Code.</p>
+      <ol class="steps">
+        <li>
+          <h3>Turn on the automation server in Edits</h3>
+          <p>Go to <b>Edits › Settings › Automation</b>, switch on <b>Enable Automation Server</b> and copy the <b>Access token</b>. Keep Edits open while Claude works.</p>
+        </li>
+        <li>
+          <h3>Add the plugin in Claude Code</h3>
+          <p>Start <code>claude</code> in a terminal and run these two commands, one at a time:</p>
+          <div class="cmd"><code>/plugin marketplace add faisalkhanzemi/insta-edits-for-claude</code><button class="copy" type="button">Copy</button></div>
+          <div class="cmd"><code>/plugin install insta-edits@insta-edits</code><button class="copy" type="button">Copy</button></div>
+          <p class="note">Claude Code asks for the access token with a masked prompt and stores it in your keychain. Never paste the token into the chat.</p>
+        </li>
+        <li>
+          <h3>Restart Claude Code and ask for an edit</h3>
+          <p>Run <code>/mcp</code> to check that <code>edits</code> is connected, then ask in plain words:</p>
+          <blockquote>Import <code>~/Movies/broll/</code> into a new project, cut it to the beat of the voice-over, and add word-by-word captions in a clean sans.</blockquote>
+          <p class="note">Prefer a standalone MCP server? <code>pipx install insta-edits</code>, then follow the <a href="https://github.com/faisalkhanzemi/insta-edits-for-claude#2b-as-a-standalone-mcp-server">README</a>.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="why" aria-labelledby="why-h">
+      <h2 id="why-h">Why Claude only sees 32 tools in Edits</h2>
+      <p>Edits changes its tools with the screen: 32 on the home screen (projects, imports, catalogs) and 274 once a project is open. It tells clients it will announce that change, but it never sends the notification, and its notification stream refuses connections. A client connected straight to Edits keeps the 32 home tools for the whole session and never sees the editor.</p>
+      <p>The plugin sits between the two. After every tool call it asks Edits which tools it offers now, and if the set has changed it tells Claude, which refreshes its list. Measured on Edits 454 and 455.</p>
+      <div class="table-scroll"><table class="compare">
+        <thead><tr><th scope="col"></th><th scope="col">Claude Code → Edits directly</th><th scope="col">With Insta Edits for Claude</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Tools after opening a project</th><td>32 (home screen only)</td><td>274 (full editor)</td></tr>
+          <tr><th scope="row">Speed-curve presets</th><td>Catalog points at a tool Edits calls refused</td><td>Routed to the working <code>setSpeedCurve</code></td></tr>
+          <tr><th scope="row">Token</th><td>In plain text in <code>~/.claude.json</code> when added as a header</td><td>macOS keychain</td></tr>
+          <tr><th scope="row">Errors</th><td>Raw HTTP errors</td><td>One-line fixes, plus <code>insta-edits doctor</code></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section aria-labelledby="can-h">
+      <h2 id="can-h">What Claude can do in Edits</h2>
+      <div class="grid">
+        <div class="card"><h3>Cut on the beat</h3><p>Import clips, find the beat (or read it from the music when Edits finds none) and trim every clip onto it.</p></div>
+        <div class="card"><h3>Captions and text</h3><p>Auto-captions in Edits' caption styles, titles, labels and text animations.</p></div>
+        <div class="card"><h3>Look and motion</h3><p>Filters, LUTs, effects, transitions, keyframed zooms and speed ramps.</p></div>
+        <div class="card"><h3>Check and export</h3><p>Render frames to check its own work, then export in the resolution and aspect ratio you ask for.</p></div>
+      </div>
+      <p class="note" style="margin-top:14px">Claude doesn't post: Edits' automation server has no posting tool, so you share the reel from the Edits window. Songs from Edits' music library come out silent in automation exports, so export from the Edits window when a library song matters.</p>
+    </section>
+
+    <section id="faq" aria-labelledby="faq-h">
+      <h2 id="faq-h">FAQ</h2>
+      <details><summary>Can Claude edit Instagram Reels?</summary><p>Yes, inside Edits for Mac. It can import clips, cut them on the beat, add captions, text, transitions, zooms and speed ramps, check rendered frames and export. You post the reel from Edits yourself.</p></details>
+      <details><summary>Can Claude post to Instagram for me?</summary><p>Not through the automation server: Edits 454 and 455 have no tool that posts, shares or schedules. Claude makes and exports the reel, and you post it from the Edits window.</p></details>
+      <details><summary>Does it work with claude.ai in the browser?</summary><p>No. Edits runs on your Mac and only listens locally, so it needs Claude Code (or another MCP client) running on the same Mac. It also works in the Code tab of the Claude desktop app.</p></details>
+      <details><summary>Does it work on Windows or with the Edits phone app?</summary><p>No. Edits on desktop is only available on macOS, and the automation server only exists there.</p></details>
+      <details><summary>What does it cost?</summary><p>The plugin is free and open source (MIT), and Edits for Mac is free. Claude Code needs a Claude plan or an Anthropic API account.</p></details>
+      <details><summary>Is there an official Claude integration for Edits?</summary><p>No. Meta built the automation server into Edits for any AI agent; in its launch interviews the example was Meta's own Muse agent. This is an independent plugin.</p></details>
+      <details><summary>Is it safe?</summary><p>The plugin only talks to Edits on your own Mac (127.0.0.1), has no telemetry, and keeps the token in your keychain, out of logs and error messages. The source is on <a href="https://github.com/faisalkhanzemi/insta-edits-for-claude">GitHub</a>.</p></details>
+    </section>
+  </main>
+
+  <footer>
+    <p>Made by <a href="https://github.com/faisalkhanzemi">Faisal Khan</a>. Version 0.1.2 · <a href="https://github.com/faisalkhanzemi/insta-edits-for-claude">GitHub</a> · <a href="https://pypi.org/project/insta-edits/">PyPI</a> · <a href="https://github.com/faisalkhanzemi/insta-edits-for-claude/blob/main/CHANGELOG.md">Changelog</a></p>
+    <p>An independent open-source project, not affiliated with or endorsed by Meta, Instagram or Anthropic. "Instagram" and "Edits" are trademarks of Meta Platforms, Inc.</p>
+    <p>Demo footage: stock clips from Pexels (Pexels License). Music: "Tech House vibes" by Alejandro Magaña, Mixkit (Mixkit License).</p>
+  </footer>
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var text = b.previousElementSibling.textContent;
+    var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); };
+    if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done, function () {}); }
+  });
+});
+</script>
+</body>
+</html>

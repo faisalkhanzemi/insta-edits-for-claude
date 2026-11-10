@@ -4,6 +4,8 @@
 
 **Let Claude Code edit in Instagram Edits for Mac, with the full editor and not just the home screen.**
 
+Step-by-step guide with the demo: [How to edit Instagram Reels with Claude in Edits for Mac](https://faisalkhanzemi.github.io/insta-edits-for-claude/)
+
 [![CI](https://github.com/faisalkhanzemi/insta-edits-for-claude/actions/workflows/ci.yml/badge.svg)](https://github.com/faisalkhanzemi/insta-edits-for-claude/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/insta-edits)](https://pypi.org/project/insta-edits/)
 [![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.faisalkhanzemi%2Finsta--edits-blue)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.faisalkhanzemi/insta-edits)
@@ -204,9 +206,15 @@ Edits updates often and its automation server is undocumented. If a new build br
 
 **How do I connect Claude to Instagram Edits?** Install Edits for Mac, switch on Settings › Automation › Enable Automation Server, then add this plugin with the two `/plugin` lines under [Install](#install). Claude can then open your projects and edit them.
 
+**Why does Claude only see 32 tools in Edits?** Edits shows 32 tools on its home screen and 274 once a project is open. It says it will tell clients when that changes, but it never does (measured on Edits 454 and 455), so a client connected straight to Edits keeps the 32 home tools for the whole session. This plugin checks after every call and tells Claude, so the editor tools appear as soon as a project opens.
+
 **Can Claude edit Instagram Reels?** Yes, inside Edits for Mac. It can import clips, cut them on the beat, add captions, text, transitions, zooms and speed ramps, check rendered frames and export. You post the reel from Edits yourself.
 
 **Does it work with claude.ai in the browser?** No. Edits runs on your Mac and only listens locally, so it needs Claude Code (or another MCP client) running on the same Mac.
+
+**Is there an official Claude integration for Edits?** No. Meta built the automation server into Edits for any AI agent; in its launch interviews the example was Meta's own Muse agent. There's no Claude plugin from Meta or Anthropic; this is an independent one.
+
+**What does it cost?** The plugin is free and open source (MIT), and Edits for Mac is free. Claude Code needs a Claude plan or an Anthropic API account.
 
 **Is this official?** No. It's an independent open-source project, not affiliated with or endorsed by Meta, Instagram or Anthropic. "Instagram" and "Edits" are trademarks of Meta Platforms, Inc.
 
@@ -214,7 +222,7 @@ Edits updates often and its automation server is undocumented. If a new build br
 
 **Do I still need this if my Claude Code build accepts Edits' replies?** Yes, for the editor tools. Edits never announces that its tools changed, and no client can find that out without asking.
 
-**Can Claude post to Instagram for me?** The bridge won't stop Claude from calling Edits' share tools, but the bundled skill tells it to wait for your explicit go-ahead. Posting from the Edits window is the safer default.
+**Can Claude post to Instagram for me?** Not through the automation server: Edits 454 and 455 have no tool that posts, shares or schedules. Claude makes and exports the reel, and you post it from the Edits window.
 
 ## Development
 
