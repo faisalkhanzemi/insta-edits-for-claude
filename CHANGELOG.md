@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Documentation
+- A guide page on GitHub Pages: https://faisalkhanzemi.github.io/insta-edits-for-claude/ (demo, install steps, why Claude only sees 32 tools, FAQ). It's also the repo's homepage.
+- FAQ: Claude can't post through the automation server, because Edits 454 and 455 have no posting tool. The old answer mentioned share tools that don't exist.
+- FAQ: why Claude only sees 32 tools, whether there's an official integration, what it costs, and what to do if you connected with the command in Edits' Settings.
+- New "Built with it" section, starting with Erivaldo Dantas's video-edit skill.
+
 ## [0.1.2] - 2026-11-10
 
 ### Fixed

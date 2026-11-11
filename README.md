@@ -220,9 +220,17 @@ Edits updates often and its automation server is undocumented. If a new build br
 
 **Does it work on Windows or with the Edits phone app?** No. Edits on desktop is only available on macOS, and the automation server only exists there.
 
+**I connected Claude with the command in Edits' Settings. Do I still need this?** Yes, if you want the editor tools. That command connects Claude Code straight to Edits, which works, but Claude keeps the tool set Edits had when it connected: 32 tools if Edits was on the home screen. To switch, run `claude mcp list`, remove the entry that points at `127.0.0.1:19501` with `claude mcp remove <name>`, then install this plugin. Keeping both gives Claude two copies of every home tool.
+
 **Do I still need this if my Claude Code build accepts Edits' replies?** Yes, for the editor tools. Edits never announces that its tools changed, and no client can find that out without asking.
 
 **Can Claude post to Instagram for me?** Not through the automation server: Edits 454 and 455 have no tool that posts, shares or schedules. Claude makes and exports the reel, and you post it from the Edits window.
+
+## Built with it
+
+- [video-edit-skill-instagram-edits](https://github.com/erivaldodantas/video-edit-skill-instagram-edits) by Erivaldo Dantas: a Claude Code skill that turns raw talking-head clips into a finished Reel in Edits. It picks the best take of each line, cuts the dead air and designs the look.
+
+Made something on top of insta-edits? Open a pull request that adds it to this list.
 
 ## Development
 
