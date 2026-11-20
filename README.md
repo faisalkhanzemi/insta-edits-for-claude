@@ -232,6 +232,11 @@ Edits updates often and its automation server is undocumented. If a new build br
 
 Made something on top of insta-edits? Open a pull request that adds it to this list.
 
+## Listed on
+
+[![LobeHub MCP Badge](https://lobehub.com/badge/mcp/faisalkhanzemi-insta-edits-for-claude)](https://lobehub.com/mcp/faisalkhanzemi-insta-edits-for-claude)
+[![Glama MCP server score](https://glama.ai/mcp/servers/faisalkhanzemi/insta-edits-for-claude/badges/score.svg)](https://glama.ai/mcp/servers/faisalkhanzemi/insta-edits-for-claude)
+
 ## Development
 
 ```bash

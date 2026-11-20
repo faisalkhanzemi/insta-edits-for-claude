@@ -9,6 +9,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - FAQ: Claude can't post through the automation server, because Edits 454 and 455 have no posting tool. The old answer mentioned share tools that don't exist.
 - FAQ: why Claude only sees 32 tools, whether there's an official integration, what it costs, and what to do if you connected with the command in Edits' Settings.
 - New "Built with it" section, starting with Erivaldo Dantas's video-edit skill.
+- New "Listed on" section with the LobeHub and Glama badges (this also claims the LobeHub listing).
 
 ## [0.1.2] - 2026-11-10
 
