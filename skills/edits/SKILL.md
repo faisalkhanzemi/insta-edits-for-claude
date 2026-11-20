@@ -11,6 +11,7 @@ It is undocumented and updated weekly, so treat the live tool list and `getCapab
 ## Before the first call
 
 - If a call fails with "Cannot reach Edits", Edits is closed or its server is off: ask the user to open Edits and turn on Settings > Automation > Enable Automation Server.
+- If `edits_status` is the only tool listed, Edits isn't reachable: call it, pass its message on to the user, and call it again once they say Edits is open. When it connects, Edits' own tools replace it.
 - If it fails with HTTP 401/403, the token changed in Edits. Ask the user to update it in `/plugin` (or run `insta-edits set-token`). Never ask them to paste the token into the chat.
 - `insta-edits doctor` in a terminal checks every link and is the first thing to run when something is off.
 

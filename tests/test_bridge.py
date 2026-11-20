@@ -228,7 +228,10 @@ def test_starts_without_edits_and_picks_it_up_when_it_appears(monkeypatch):
     assert "isn't reachable" in init["result"]["instructions"]
     b.send(INITIALIZED)
     b.send({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
-    assert b.wait_for(lambda m: m.get("id") == 2)["result"] == {"tools": []}
+    offline_tools = b.wait_for(lambda m: m.get("id") == 2)["result"]["tools"]
+    assert [t["name"] for t in offline_tools] == ["edits_status"]
+    assert offline_tools[0]["inputSchema"]["type"] == "object"
+    assert offline_tools[0]["annotations"]["readOnlyHint"] is True
     b.send({"jsonrpc": "2.0", "id": 3, "method": "ping"})
     assert b.wait_for(lambda m: m.get("id") == 3)["result"] == {}
 
@@ -251,3 +254,58 @@ def test_calls_still_explain_what_to_do_while_edits_is_closed():
     assert err["code"] == -32001
     assert "Enable Automation Server" in err["message"]
     b.close()
+
+
+STATUS_CALL = {"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "edits_status", "arguments": {}}}
+
+
+def test_status_tool_explains_what_to_do_while_edits_is_closed():
+    port = _free_port()
+    b = BridgeProcess(f"http://127.0.0.1:{port}/mcp")
+    b.send(INIT)
+    b.wait_for(lambda m: m.get("id") == 1)
+    b.send(INITIALIZED)
+    b.send({**STATUS_CALL, "id": 6})
+    result = b.wait_for(lambda m: m.get("id") == 6)["result"]
+    assert result["isError"] is False
+    assert result["structuredContent"]["connected"] is False
+    assert "Enable Automation Server" in result["content"][0]["text"]
+    b.close()
+
+
+def test_status_tool_connects_as_soon_as_edits_answers(monkeypatch):
+    port = _free_port()
+    monkeypatch.setenv("INSTA_EDITS_OFFLINE_POLL", "600")  # only the tool call can connect in this test
+    b = BridgeProcess(f"http://127.0.0.1:{port}/mcp")
+    b.send(INIT)
+    b.wait_for(lambda m: m.get("id") == 1)
+    b.send(INITIALIZED)
+    with FakeEdits(port=port):
+        b.send({**STATUS_CALL, "id": 7})
+        result = b.wait_for(lambda m: m.get("id") == 7)["result"]
+        assert result["structuredContent"]["connected"] is True
+        b.wait_for(lambda m: m.get("method") == "notifications/tools/list_changed")
+        b.send({"jsonrpc": "2.0", "id": 8, "method": "tools/list"})
+        names = {t["name"] for t in b.wait_for(lambda m: m.get("id") == 8)["result"]["tools"]}
+        assert "edits_status" not in names
+        assert names >= {"appState", "openProject"}
+        b.close()
+
+
+def test_status_tool_answers_locally_when_edits_is_connected():
+    with FakeEdits() as edits:
+        b = BridgeProcess(edits.url)
+        b.send(INIT)
+        b.wait_for(lambda m: m.get("id") == 1)
+        b.send(INITIALIZED)
+        b.send({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
+        names = {t["name"] for t in b.wait_for(lambda m: m.get("id") == 2)["result"]["tools"]}
+        assert "edits_status" not in names, "the status tool is only listed while Edits is unreachable"
+        b.send({**STATUS_CALL, "id": 9})
+        result = b.wait_for(lambda m: m.get("id") == 9)["result"]
+        assert result["structuredContent"]["connected"] is True
+        assert not any(
+            r["msg"].get("method") == "tools/call" and r["msg"].get("params", {}).get("name") == "edits_status"
+            for r in edits.received
+        ), "edits_status must not be forwarded to Edits"
+        b.close()

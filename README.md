@@ -36,7 +36,7 @@ Claude Code ──stdio──▶ insta-edits ──HTTP──▶ Edits for Mac (
 - **Replies that every Claude Code build accepts.** Edits marks each result `"resultType": "complete"` without the caching fields that newer MCP schemas pair with it. Some Claude Code builds then dropped every tool, with `Invalid result for tools/list: ttlMs … cacheScope`. The bridge removes the marker only when those fields are missing.
 - **Speed curves that work.** Edits' catalog says to apply speed-curve presets with `selectSpeedPanelPreset`, a tool whose own description says it is deprecated, refused and crashed the app. The bridge points those catalog entries at `setSpeedCurve`, which takes the same preset and works (tested on Edits 455).
 - **Your token stays private.** The plugin keeps it in the macOS keychain. The CLI keeps it in a `0600` file. It never appears in `~/.claude.json`, in logs or in error messages.
-- **Start in any order.** If Edits isn't open yet, the bridge still connects and reports no tools, then tells Claude the moment Edits answers, so the editor appears without a restart.
+- **Start in any order.** If Edits isn't open yet, the bridge still connects and lists one tool, `edits_status`, that says what to do and connects the moment Edits answers. Then Edits' own tools replace it, without a restart.
 - **Errors you can act on.** "Cannot reach Edits: open it and enable the Automation Server" replaces a stack trace. A rejected token says how to update it.
 - **`doctor` checks every link** from the app to the sign-in, and `--json` gives you a report to attach to a bug.
 - **An `edits` skill** that teaches Claude how the server behaves: discover before guessing, work in normalised canvas coordinates, check rendered frames, and **never publish without your explicit go-ahead**.
@@ -167,7 +167,7 @@ Claude opens the project, the editor tools appear, and it works from them. It do
 | Replies | It accepts both JSON and `text/event-stream` replies and batch requests, normalises `resultType` only when the caching fields are missing, and points the speed-curve catalog entries at `setSpeedCurve`. |
 | Tool sync | After each `tools/call` it sends its own `tools/list` to Edits, using an id Claude never sees, and compares the tool names. If they changed, it writes `notifications/tools/list_changed` to Claude. Turn this off with `serve --no-sync`. |
 | Notifications | If a future Edits build opens a server-to-client stream, the bridge listens on it and forwards what arrives. Edits doesn't offer one today, so the bridge stops trying after the first refusal. Turn it off with `serve --no-stream`. |
-| Edits closed | The bridge answers `initialize` itself, reports no tools and retries Edits every 5 seconds (`INSTA_EDITS_OFFLINE_POLL`). When Edits answers, it opens the session and sends `notifications/tools/list_changed`. |
+| Edits closed | The bridge answers `initialize` itself, lists only `edits_status` (read-only: checks Edits now, connects if it answers, else explains how to turn on the Automation Server) and retries Edits every 5 seconds (`INSTA_EDITS_OFFLINE_POLL`). When Edits answers, it opens the session and sends `notifications/tools/list_changed`, and Edits' tools replace `edits_status`. |
 | Errors | A tool call while Edits is closed returns JSON-RPC `-32001`. An HTTP error from Edits returns `-32002`. Both carry a one-line fix. |
 
 Settings come from the environment: `EDITS_MCP_URL` (default `http://127.0.0.1:19501/mcp`), `EDITS_MCP_TOKEN`, and `EDITS_MCP_TOKEN_FILE`. Logs go to stderr.

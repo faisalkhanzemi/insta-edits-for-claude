@@ -92,17 +92,43 @@ class ToolSync:
 OFFLINE_INSTRUCTIONS = (
     "Instagram Edits for Mac isn't reachable yet, so no Edits tools are available. "
     + HINT_UNREACHABLE
-    + " The tools appear on their own once Edits answers."
+    + " The tools appear on their own once Edits answers; call edits_status to check now."
 )
+
+STATUS_TOOL_NAME = "edits_status"
+STATUS_TOOL = {
+    "name": STATUS_TOOL_NAME,
+    "title": "Edits connection status",
+    "description": (
+        "Checks whether Instagram Edits for Mac is reachable, and connects to it if it is. Listed only while "
+        "Edits isn't reachable: once it answers, Edits' own tools (32 on the home screen, about 270 inside a "
+        "project) replace this one. Call it when the user wants something done in Edits but no Edits tools "
+        "are listed."
+    ),
+    "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
+    "annotations": {"title": "Edits connection status", "readOnlyHint": True, "openWorldHint": False},
+}
+
+
+def _text_result(rid: Any, text: str, connected: bool) -> dict:
+    return {
+        "jsonrpc": "2.0",
+        "id": rid,
+        "result": {
+            "content": [{"type": "text", "text": text}],
+            "structuredContent": {"connected": connected, "detail": text},
+            "isError": False,
+        },
+    }
 
 
 class Offline:
     """Lets the client connect before Edits is running.
 
     If Edits can't be reached when the client initializes, the bridge answers `initialize` itself,
-    reports no tools, and keeps trying Edits in the background. When Edits answers, the bridge
-    opens the real session and sends `notifications/tools/list_changed`, so the editor's tools
-    appear without restarting the client.
+    lists a single `edits_status` tool, and keeps trying Edits in the background. When Edits answers,
+    the bridge opens the real session and sends `notifications/tools/list_changed`, so the editor's
+    tools appear without restarting the client. Calling `edits_status` checks right away.
     """
 
     def __init__(self, client: EditsClient, writer: Writer, stop: threading.Event, log: Callable[[str], None]):
@@ -111,6 +137,7 @@ class Offline:
         self._stop = stop
         self._log = log
         self._lock = threading.Lock()
+        self._connecting = threading.Lock()
         self._init: Optional[dict] = None
         self.active = False
         try:
@@ -139,31 +166,64 @@ class Offline:
         }
 
     def answer_locally(self, message: Any) -> Optional[dict]:
-        """While offline, reply to the few requests that don't need Edits. None means forward it."""
-        if not self.active or not isinstance(message, dict):
+        """Reply to the requests that don't need Edits. None means forward it."""
+        if not isinstance(message, dict):
             return None
         method = message.get("method")
+        params = message.get("params") if isinstance(message.get("params"), dict) else {}
+        if method == "tools/call" and params.get("name") == STATUS_TOOL_NAME and "id" in message:
+            return self._status(message["id"])
+        if not self.active:
+            return None
         if method == "tools/list":
-            return {"jsonrpc": "2.0", "id": message.get("id"), "result": {"tools": []}}
+            return {"jsonrpc": "2.0", "id": message.get("id"), "result": {"tools": [STATUS_TOOL]}}
         if method == "ping":
             return {"jsonrpc": "2.0", "id": message.get("id"), "result": {}}
         return None
 
-    def _reconnect(self) -> None:
-        while not self._stop.wait(self._interval):
+    def _status(self, rid: Any) -> dict:
+        if not self.active:
+            return _text_result(rid, f"Edits is connected at {self._client.url}; its own tools are listed.", True)
+        problem = self._connect_once()
+        if problem is None:
+            return _text_result(
+                rid,
+                "Edits answered just now and the bridge is connected. Its tools replace this one; "
+                "the client has been told to reload the tool list.",
+                True,
+            )
+        return _text_result(
+            rid,
+            f"{problem} The bridge keeps checking every {self._interval:g} s, and Edits' tools appear on their own "
+            "once it answers.",
+            False,
+        )
+
+    def _connect_once(self) -> Optional[str]:
+        """Try to open the real session. Returns None when connected, else what's wrong."""
+        with self._connecting:
             with self._lock:
+                if not self.active:
+                    return None
                 init = dict(self._init or {})
             init["id"] = "insta-edits:reconnect"
             try:
                 self._client.post(init)
                 self._client.post({"jsonrpc": "2.0", "method": "notifications/initialized"})
-            except (EditsUnreachable, EditsHTTPError):
-                continue
+            except EditsUnreachable:
+                return f"Edits isn't reachable at {self._client.url}. {HINT_UNREACHABLE}"
+            except EditsHTTPError as err:
+                return _describe_http_error(err)
             with self._lock:
                 self.active = False
             self._log("Edits is reachable now; notifying the client")
             self._writer.write(LIST_CHANGED)
-            return
+            return None
+
+    def _reconnect(self) -> None:
+        while not self._stop.wait(self._interval):
+            if not self.active or self._connect_once() is None:
+                return
 
 
 def serve(

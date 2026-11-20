@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-20
+
+### Added
+- `edits_status`: while Edits isn't reachable, the bridge lists this one read-only tool instead of an empty list. Calling it checks Edits right away and connects if it answers (then Edits' own tools replace it and the client is told to reload the list); otherwise it says how to turn on the Automation Server, or that the access token was rejected. Before, a client connected while Edits was closed saw no tools at all and no hint, and directory scanners that run the server without Edits (LobeHub, Glama) found nothing to check. Once Edits is connected, a stale call to `edits_status` is answered by the bridge and never forwarded to Edits.
+
+### Tests
+- The status tool while Edits is closed, connecting through it the moment Edits appears (with background retries turned off), and answering it locally once Edits is connected.
+
 ### Documentation
 - A guide page on GitHub Pages: https://faisalkhanzemi.github.io/insta-edits-for-claude/ (demo, install steps, why Claude only sees 32 tools, FAQ). It's also the repo's homepage.
 - FAQ: Claude can't post through the automation server, because Edits 454 and 455 have no posting tool. The old answer mentioned share tools that don't exist.
@@ -53,6 +61,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `doctor` command (with `--json` for bug reports) and `set-token` (hidden prompt, file saved with 0600 permissions).
 - Claude Code plugin with a keychain-stored token prompt, a marketplace manifest, and an `edits` skill with notes measured against Edits 454: sandboxed import folders, absolute paths, HDR projects, beat detection fallback, keyframe and export formats, and library music in automation exports.
 
+[0.1.3]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.3
 [0.1.2]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.2
 [0.1.1]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.1
 [0.1.0]: https://github.com/faisalkhanzemi/insta-edits-for-claude/releases/tag/v0.1.0
