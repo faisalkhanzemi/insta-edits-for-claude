@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Tests
+- CI runs the Python 3.9 tests on Ubuntu 24.04, because GitHub's `ubuntu-latest` (now 26.04) has no Python 3.9. macOS keeps testing 3.9 too.
+
 ## [0.1.3] - 2026-11-20
 
 ### Added

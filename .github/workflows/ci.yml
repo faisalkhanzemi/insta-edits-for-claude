@@ -29,6 +29,13 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest]
         python: ["3.9", "3.11", "3.13"]
+        # ubuntu-latest (26.04) has no Python 3.9 build; 3.9 is macOS's own Python, so keep testing it on 24.04.
+        exclude:
+          - os: ubuntu-latest
+            python: "3.9"
+        include:
+          - os: ubuntu-24.04
+            python: "3.9"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
